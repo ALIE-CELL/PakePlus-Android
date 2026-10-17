@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#1f6feb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>实验记录</title>
+  <style>
+/* ===== 手机端样式：大按钮、大字号、单手可点 ===== */
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #f2f4f7;
+  --panel: #fff;
+  --ink: #1f2329;
+  --ink2: #5a6472;
+  --ink3: #8a8f99;
+  --line: #e2e5ea;
+  --blue: #1f6feb;
+  --green: #0f9d58;
+  --red: #d03050;
+  --amber: #d97706;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  overflow: hidden;
+}
+
+button, input, select, textarea { font-family: inherit; font-size: 16px; color: inherit; }
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ===== 顶部 ===== */
+.top {
+  flex-shrink: 0;
+  background: var(--blue);
+  color: #fff;
+  padding: 14px 18px calc(14px + env(safe-area-inset-top, 0px) * 0);
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+}
+.top-title { font-size: 19px; font-weight: 600; }
+.top-sub { font-size: 12px; opacity: .82; margin-top: 3px; }
+
+/* ===== 内容区 ===== */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 12px 20px;
+}
+
+.pane { display: none; }
+.pane.on { display: block; }
+
+/* ===== 底部 Tab ===== */
+.tabs {
+  flex-shrink: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0 6px;
+  color: var(--ink3);
+  cursor: pointer;
+  user-select: none;
+}
+.tab.on { color: var(--blue); }
+.tab .ico { font-size: 20px; line-height: 1.2; }
+.tab .lbl { font-size: 11px; margin-top: 1px; }
+
+/* ===== 卡片 section ===== */
+.sec {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.sec-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 10px;
+}
+
+/* ===== 表单 ===== */
+.fld { display: block; margin-bottom: 12px; }
+.fld > span {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink3);
+  margin-bottom: 6px;
+}
+input[type=text], input[type=date], input[type=number], select, textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fafbfc;
+  outline: none;
+  font-size: 16px; /* 16px 防止 iOS 自动放大 */
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--blue);
+  background: #fff;
+}
+textarea { resize: vertical; line-height: 1.5; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+
+/* ===== 模板 ===== */
+.tpls { display: flex; flex-wrap: wrap; gap: 8px; }
+.tpl {
+  flex: 1 1 calc(50% - 8px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fafbfc;
+  cursor: pointer;
+  min-width: 140px;
+}
+.tpl:active { background: #eef4ff; border-color: var(--blue); }
+.tpl-n { font-size: 14px; font-weight: 600; }
+.tpl-m { font-size: 12px; color: var(--ink3); margin-top: 3px; }
+
+/* ===== 物料行 ===== */
+.mat-row {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #fafbfc;
+}
+.mat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.mat-head .role {
+  font-size: 12px;
+  background: #e8f0fe;
+  color: var(--blue);
+  padding: 3px 9px;
+  border-radius: 5px;
+}
+.mat-head .del {
+  border: none;
+  background: transparent;
+  color: var(--red);
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.mat-body {
+  display: grid;
+  grid-template-columns: 1fr 92px 34px;
+  gap: 6px;
+  align-items: center;
+}
+.mat-body .unit { font-size: 13px; color: var(--ink3); text-align: center; }
+
+/* ===== 按钮 ===== */
+.btn {
+  width: 100%;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn:active { opacity: .85; }
+.btn:disabled { background: #c5cbd4; }
+.btn.big { padding: 16px; font-size: 17px; font-weight: 600; }
+.btn.ghost { background: #fff; color: var(--blue); border: 1px solid var(--blue); }
+.btn.gray { background: #f2f4f7; color: var(--ink2); border: 1px solid var(--line); }
+.btn.danger { background: #fff; color: var(--red); border: 1px solid var(--red); }
+.btn.sm { padding: 8px 14px; font-size: 14px; width: auto; border-radius: 7px; }
+
+.actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.actions .btn.gray { width: 100%; }
+
+/* ===== 记录卡 ===== */
+.rec {
+  border-bottom: 1px solid var(--line);
+  padding: 12px 0;
+}
+.rec:last-child { border-bottom: none; }
+.rec-head { display: flex; justify-content: space-between; font-size: 13px; }
+.rec-sys { color: var(--blue); font-weight: 600; }
+.rec-date { color: var(--ink3); }
+.rec-t { font-size: 15px; margin: 5px 0 4px; }
+.rec-m { font-size: 12.5px; color: var(--ink3); display: flex; align-items: center; gap: 6px; }
+.rec-ops { display: flex; gap: 8px; margin-top: 9px; }
+
+.tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  background: #eef2f7;
+  color: var(--ink2);
+}
+.tag.ok { background: #e6f7ee; color: var(--green); }
+.tag.warn { background: #fff4e5; color: var(--amber); }
+.tag.bad { background: #fdecef; color: var(--red); }
+
+.muted { color: var(--ink3); }
+.small { font-size: 13px; }
+.mono { font-family: Consolas, monospace; }
+
+/* ===== 复制兜底层 ===== */
+.fallback {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,26,35,.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+}
+.fallback.show { display: flex; }
+.fb-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+.fb-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.fb-name { font-size: 12px; color: var(--ink3); margin-bottom: 10px; word-break: break-all; }
+.fb-box textarea {
+  flex: 1;
+  min-height: 200px;
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+/* ===== Toast ===== */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 86px;
+  transform: translateX(-50%) translateY(12px);
+  background: #232b38;
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: .2s;
+  z-index: 200;
+  max-width: 86%;
+  text-align: center;
+  line-height: 1.5;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.err { background: var(--red); }
+#toast.ok { background: var(--green); }
+
+/* ===== 大屏（平板）微调 ===== */
+@media (min-width: 600px) {
+  .content { max-width: 620px; margin: 0 auto; width: 100%; }
+  .tpls .tpl { flex-basis: calc(33.33% - 8px); }
+}
+
+</style>
+  <!-- 单文件版，构建于 2026-10-17 05:07:53 -->
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <div class="top-title">实验记录</div>
+    <div class="top-sub" id="topSub">离线记录 · 导入内网后扣库存</div>
+  </header>
+
+  <!-- ===== 内容区 ===== -->
+  <main class="content">
+
+    <section class="pane on" id="pane-new"></section>
+    <section class="pane" id="pane-list"></section>
+    <section class="pane" id="pane-me"></section>
+
+  </main>
+
+  <!-- ===== 底部导航 ===== -->
+  <nav class="tabs">
+    <div class="tab on" data-tab="new">
+      <div class="ico">＋</div>
+      <div class="lbl">记录</div>
+    </div>
+    <div class="tab" data-tab="list">
+      <div class="ico">☰</div>
+      <div class="lbl">待传</div>
+    </div>
+    <div class="tab" data-tab="me">
+      <div class="ico">☺</div>
+      <div class="lbl">我的</div>
+    </div>
+  </nav>
+
+</div>
+
+<!-- ===== 复制兜底层 ===== -->
+<div class="fallback" id="fallback">
+  <div class="fb-box">
+    <div class="fb-title">请复制下面内容</div>
+    <div class="fb-name" id="fallbackName"></div>
+    <textarea id="fallbackText" readonly></textarea>
+    <button class="btn" id="fallbackClose">关闭</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/**
+ * 体系化预设数据：电池体系、物料库、常用实验模板。
+ *
+ * 为什么单独一个文件：这部分是"领域知识"，需要化学工程师持续补充和维护，
+ * 和程序逻辑分开，改这里不会碰坏功能。
+ *
+ * ⚠️ 关于完整度（请务必读）
+ * 下面是按行业内通用做法整理的基线清单，覆盖各体系最常见的主材、辅材、装配件与工序。
+ * 它不可能等于你们实验室的真实清单——每个课题组的路线、供应商、命名习惯都不同。
+ * 标了 needsReview: true 的条目，建议你逐条过一遍：
+ *   · 名字对不对（用你们内部叫法）
+ *   · 有没有你们常用但这里没列到的料
+ *   · 有没有这里列了但你们根本不用的（删掉）
+ * 骨架已经搭好，你们只需要删改，不需要从零建。
+ *
+ * 数据结构：
+ *   System.materials[]  —— { role, alias, unit, needsReview? }
+ *   System.templates[]  —— { id, name, type, steps, resultTag, roles, notes, needsReview? }
+ *
+ * role 取值见 ROLES。
+ */
+
+/* ===================== 用途分类（物料角色） ===================== */
+const ROLES = [
+  { id: 'pos',  name: '正极材料' },
+  { id: 'neg',  name: '负极材料' },
+  { id: 'ele',  name: '电解液' },
+  { id: 'sep',  name: '隔膜' },
+  { id: 'cond', name: '导电剂' },
+  { id: 'bind', name: '粘结剂' },
+  { id: 'cf',   name: '集流体' },
+  { id: 'add',  name: '添加剂' },
+  { id: 'ss',   name: '固态电解质' },
+  { id: 'cat',  name: '催化剂' },
+  { id: 'mem',  name: '膜材料' },
+  { id: 'li',   name: '锂源/锂片' },
+  { id: 'na',   name: '钠源/钠片' },
+  { id: 'gas',  name: '气体' },
+  { id: 'case', name: '壳体/配件' },
+  { id: 'sol',  name: '溶剂' },
+  { id: 'pre',  name: '前驱体/原料' },
+  { id: 'oth',  name: '其他' }
+];
+
+const ROLE_NAME = {};
+ROLES.forEach((r) => { ROLE_NAME[r.id] = r.name; });
+
+/* ===================== 电池体系 ===================== */
+
+const SYSTEMS = [
+  /* ============================================================
+   * 锂电 · 高温
+   * ============================================================ */
+  {
+    id: 'LI-HT',
+    code: 'LI-HT',
+    name: '锂电·高温',
+    desc: '高温循环/存储，通常 45℃ 以上工况',
+    materials: [
+      { role: 'pos',  alias: '高温型正极材料A',    unit: 'g' },
+      { role: 'pos',  alias: '高温型正极材料B',    unit: 'g' },
+      { role: 'pos',  alias: '高温型正极材料C',    unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '人造石墨',           unit: 'g' },
+      { role: 'neg',  alias: '天然石墨',           unit: 'g' },
+      { role: 'neg',  alias: '硅碳负极',           unit: 'g' },
+      { role: 'ele',  alias: '高温电解液1',        unit: 'mL' },
+      { role: 'ele',  alias: '高温电解液2',        unit: 'mL' },
+      { role: 'ele',  alias: '高温电解液3',        unit: 'mL', needsReview: true },
+      { role: 'sep',  alias: '耐高温隔膜',         unit: '张' },
+      { role: 'sep',  alias: '陶瓷涂覆隔膜',       unit: '张' },
+      { role: 'cond', alias: '导电炭黑',           unit: 'g' },
+      { role: 'cond', alias: '碳纳米管',           unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',         unit: 'g' },
+      { role: 'bind', alias: 'CMC粘结剂',          unit: 'g' },
+      { role: 'bind', alias: 'SBR粘结剂',          unit: 'g' },
+      { role: 'cf',   alias: '铝箔',               unit: '张' },
+      { role: 'cf',   alias: '铜箔',               unit: '张' },
+      { role: 'cf',   alias: '镍极耳',             unit: '个' },
+      { role: 'cf',   alias: '铝极耳',             unit: '个' },
+      { role: 'add',  alias: '高温添加剂1',        unit: 'mL' },
+      { role: 'add',  alias: '成膜添加剂',         unit: 'mL' },
+      { role: 'sol',  alias: 'NMP溶剂',            unit: 'mL' },
+      { role: 'case', alias: '扣式电池壳',         unit: '套' },
+      { role: 'case', alias: '铝塑膜',             unit: '张' }
+    ],
+    templates: [
+      {
+        id: 'LI-HT-T1', name: '高温循环验证', type: '测试',
+        steps: '极片制备 → 组装扣电 → 静置 → 高温柜循环测试 → 定期取数',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: '关注高温下的容量保持与产气趋势'
+      },
+      {
+        id: 'LI-HT-T2', name: '高温存储验证', type: '测试',
+        steps: '化成 → 满电存储（高温）→ 定期测容与厚度 → 恢复测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: '存储后测厚度变化与容量恢复率'
+      },
+      {
+        id: 'LI-HT-T3', name: '电解液配方对照', type: '对照',
+        steps: '同批极片 → 两组电解液分别组装 → 同条件高温测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: '只记组别与结论，配比留本地台账'
+      },
+      {
+        id: 'LI-HT-T4', name: '正极材料高温对比', type: '对照',
+        steps: '多种正极同工艺制片 → 同条件组装 → 高温循环对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: ''
+      },
+      {
+        id: 'LI-HT-T5', name: '高温添加剂筛选', type: '对照',
+        steps: '基础电解液 + 不同添加剂 → 分别组装 → 高温存储后对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'add', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'LI-HT-T6', name: '极片工艺验证', type: '验证',
+        steps: '同配方不同工艺档位制片 → 同条件组装 → 高温测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'cond', 'bind', 'cf', 'ele', 'sep'],
+        notes: '工艺差异用档位表示，不写具体参数'
+      },
+      {
+        id: 'LI-HT-T7', name: '隔膜耐高温对比', type: '对照',
+        steps: '同批极片 → 不同隔膜组装 → 高温循环 + 热收缩观察',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'LI-HT-T8', name: '失效电池拆解分析', type: '表征',
+        steps: '拆解 → 观察界面 → 取样送表征 → 记录现象',
+        resultTag: '异常',
+        roles: ['case'],
+        notes: '只描述现象与结论，不写具体成分数据'
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 锂电 · 低温
+   * ============================================================ */
+  {
+    id: 'LI-LT',
+    code: 'LI-LT',
+    name: '锂电·低温',
+    desc: '低温放电/充电，通常 -20℃ 以下工况',
+    materials: [
+      { role: 'pos',  alias: '低温型正极材料A',    unit: 'g' },
+      { role: 'pos',  alias: '低温型正极材料B',    unit: 'g' },
+      { role: 'pos',  alias: '低温型正极材料C',    unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '低温负极材料A',      unit: 'g' },
+      { role: 'neg',  alias: '低温负极材料B',      unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '硬碳负极',           unit: 'g' },
+      { role: 'ele',  alias: '低温电解液1',        unit: 'mL' },
+      { role: 'ele',  alias: '低温电解液2',        unit: 'mL' },
+      { role: 'ele',  alias: '低温电解液3',        unit: 'mL', needsReview: true },
+      { role: 'sep',  alias: '薄型隔膜',           unit: '张' },
+      { role: 'sep',  alias: '陶瓷涂覆隔膜',       unit: '张' },
+      { role: 'cond', alias: '导电炭黑',           unit: 'g' },
+      { role: 'cond', alias: '碳纳米管',           unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',         unit: 'g' },
+      { role: 'bind', alias: 'CMC粘结剂',          unit: 'g' },
+      { role: 'bind', alias: 'SBR粘结剂',          unit: 'g' },
+      { role: 'cf',   alias: '铝箔',               unit: '张' },
+      { role: 'cf',   alias: '铜箔',               unit: '张' },
+      { role: 'cf',   alias: '镍极耳',             unit: '个' },
+      { role: 'add',  alias: '低温添加剂1',        unit: 'mL' },
+      { role: 'add',  alias: '成膜添加剂',         unit: 'mL' },
+      { role: 'add',  alias: '抗析锂添加剂',       unit: 'mL', needsReview: true },
+      { role: 'sol',  alias: 'NMP溶剂',            unit: 'mL' },
+      { role: 'sol',  alias: '低温共溶剂',         unit: 'mL', needsReview: true },
+      { role: 'case', alias: '扣式电池壳',         unit: '套' },
+      { role: 'case', alias: '铝塑膜',             unit: '张' }
+    ],
+    templates: [
+      {
+        id: 'LI-LT-T1', name: '低温放电验证', type: '测试',
+        steps: '极片制备 → 组装 → 常温化成 → 低温柜放电测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: '记录低温下放电容量保持情况（写结论，不写具体数值）'
+      },
+      {
+        id: 'LI-LT-T2', name: '低温电解液筛选', type: '对照',
+        steps: '同批极片 → 多种电解液分别组装 → 低温同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'LI-LT-T3', name: '低温充电能力验证', type: '测试',
+        steps: '组装 → 常温化成 → 低温充电 → 拆解观察析锂',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: '重点观察低温充电是否析锂'
+      },
+      {
+        id: 'LI-LT-T4', name: '宽温域适应性初测', type: '测试',
+        steps: '组装 → 常温激活 → 常温/低温/高温各测一轮',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: '用于快速筛选宽温域方案'
+      },
+      {
+        id: 'LI-LT-T5', name: '负极低温性能对比', type: '对照',
+        steps: '多种负极同工艺制片 → 同条件组装 → 低温放电对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: ''
+      },
+      {
+        id: 'LI-LT-T6', name: '共溶剂比例对照', type: '对照',
+        steps: '不同共溶剂档位配电解液 → 分别组装 → 低温对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sol', 'sep', 'case'],
+        notes: '比例只用档位编号'
+      },
+      {
+        id: 'LI-LT-T7', name: '低温循环衰减测试', type: '测试',
+        steps: '组装 → 化成 → 低温下多次循环 → 记录衰减趋势',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'LI-LT-T8', name: '低温阻抗测试', type: '测试',
+        steps: '组装 → 化成 → 不同温度下测阻抗',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: '只记对比结论'
+      },
+      {
+        id: 'LI-LT-T9', name: '隔膜对低温性能影响', type: '对照',
+        steps: '同批极片 → 不同隔膜组装 → 低温放电对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 锂电 · 宽温域
+   * ============================================================ */
+  {
+    id: 'LI-WT',
+    code: 'LI-WT',
+    name: '锂电·宽温域',
+    desc: '兼顾高低温，通常 -40℃ ~ 60℃',
+    materials: [
+      { role: 'pos',  alias: '宽温型正极材料A',    unit: 'g' },
+      { role: 'pos',  alias: '宽温型正极材料B',    unit: 'g' },
+      { role: 'neg',  alias: '宽温型负极材料A',    unit: 'g' },
+      { role: 'neg',  alias: '宽温型负极材料B',    unit: 'g', needsReview: true },
+      { role: 'ele',  alias: '宽温电解液1',        unit: 'mL' },
+      { role: 'ele',  alias: '宽温电解液2',        unit: 'mL' },
+      { role: 'ele',  alias: '宽温电解液3',        unit: 'mL', needsReview: true },
+      { role: 'sep',  alias: '陶瓷涂覆隔膜',       unit: '张' },
+      { role: 'sep',  alias: '薄型隔膜',           unit: '张' },
+      { role: 'cond', alias: '导电炭黑',           unit: 'g' },
+      { role: 'cond', alias: '碳纳米管',           unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',         unit: 'g' },
+      { role: 'bind', alias: 'CMC粘结剂',          unit: 'g' },
+      { role: 'bind', alias: 'SBR粘结剂',          unit: 'g' },
+      { role: 'cf',   alias: '铝箔',               unit: '张' },
+      { role: 'cf',   alias: '铜箔',               unit: '张' },
+      { role: 'cf',   alias: '镍极耳',             unit: '个' },
+      { role: 'add',  alias: '宽温添加剂1',        unit: 'mL' },
+      { role: 'add',  alias: '成膜添加剂',         unit: 'mL' },
+      { role: 'sol',  alias: 'NMP溶剂',            unit: 'mL' },
+      { role: 'case', alias: '扣式电池壳',         unit: '套' },
+      { role: 'case', alias: '铝塑膜',             unit: '张' }
+    ],
+    templates: [
+      {
+        id: 'LI-WT-T1', name: '全温区性能摸底', type: '测试',
+        steps: '组装 → 常温化成 → 低温/常温/高温三档测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: '一次拿到全温区表现，便于横向对比'
+      },
+      {
+        id: 'LI-WT-T2', name: '宽温电解液对比', type: '对照',
+        steps: '同批极片 → 对照电解液分别组装 → 全温区测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'LI-WT-T3', name: '极片工艺对宽温的影响', type: '验证',
+        steps: '同配方不同工艺档位制片 → 同条件组装 → 全温区测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: '工艺差异用档位表示'
+      },
+      {
+        id: 'LI-WT-T4', name: '负极宽温适应性对比', type: '对照',
+        steps: '多种负极同工艺制片 → 组装 → 全温区测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: ''
+      },
+      {
+        id: 'LI-WT-T5', name: '高温存储 + 低温放电组合验证', type: '测试',
+        steps: '化成 → 高温存储 → 低温放电 → 记录综合表现',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: '这是宽温域最贴近实用的组合工况'
+      },
+      {
+        id: 'LI-WT-T6', name: '宽温循环长测', type: '测试',
+        steps: '组装 → 化成 → 变温循环 → 定期取数',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'LI-WT-T7', name: '添加剂对全温区影响', type: '对照',
+        steps: '基础电解液 + 不同添加剂 → 组装 → 全温区对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'add', 'sep', 'case'],
+        notes: ''
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 钠离子电池
+   * ============================================================ */
+  {
+    id: 'NA',
+    code: 'NA',
+    name: '钠离子电池',
+    desc: '层状氧化物 / 聚阴离子 / 普鲁士蓝三条主流路线',
+    materials: [
+      { role: 'pos',  alias: '钠电正极-层状氧化物A', unit: 'g' },
+      { role: 'pos',  alias: '钠电正极-层状氧化物B', unit: 'g', needsReview: true },
+      { role: 'pos',  alias: '钠电正极-聚阴离子A',   unit: 'g' },
+      { role: 'pos',  alias: '钠电正极-聚阴离子B',   unit: 'g', needsReview: true },
+      { role: 'pos',  alias: '钠电正极-普鲁士蓝',    unit: 'g' },
+      { role: 'neg',  alias: '硬碳负极A',           unit: 'g' },
+      { role: 'neg',  alias: '硬碳负极B',           unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '软碳负极',            unit: 'g' },
+      { role: 'ele',  alias: '钠电电解液1',         unit: 'mL' },
+      { role: 'ele',  alias: '钠电电解液2',         unit: 'mL' },
+      { role: 'ele',  alias: '钠电电解液3',         unit: 'mL', needsReview: true },
+      { role: 'sep',  alias: '钠电隔膜',            unit: '张' },
+      { role: 'sep',  alias: '玻璃纤维隔膜',        unit: '张' },
+      { role: 'cond', alias: '导电炭黑',            unit: 'g' },
+      { role: 'cond', alias: '碳纳米管',            unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',          unit: 'g' },
+      { role: 'bind', alias: 'CMC粘结剂',           unit: 'g' },
+      { role: 'bind', alias: 'SBR粘结剂',           unit: 'g' },
+      { role: 'cf',   alias: '铝箔',                unit: '张' },
+      { role: 'cf',   alias: '铜箔',                unit: '张' },
+      { role: 'cf',   alias: '不锈钢网',            unit: '张' },
+      { role: 'na',   alias: '钠片',                unit: '片' },
+      { role: 'add',  alias: '钠电添加剂1',         unit: 'mL', needsReview: true },
+      { role: 'sol',  alias: 'NMP溶剂',             unit: 'mL' },
+      { role: 'pre',  alias: '钠源',                unit: 'g' },
+      { role: 'pre',  alias: '铁源',                unit: 'g' },
+      { role: 'case', alias: '扣式电池壳',          unit: '套' },
+      { role: 'case', alias: '铝塑膜',              unit: '张' }
+    ],
+    templates: [
+      {
+        id: 'NA-T1', name: '钠电正极半电池测试', type: '测试',
+        steps: '正极制片 → 对钠片组装半电池 → 静置 → 充放电测试',
+        resultTag: '待测',
+        roles: ['pos', 'na', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NA-T2', name: '三种正极路线对比', type: '对照',
+        steps: '三种正极同工艺制片 → 同条件组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'na', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: '层状/聚阴离子/普鲁士蓝横向比较'
+      },
+      {
+        id: 'NA-T3', name: '钠电全电池验证', type: '验证',
+        steps: '正极 + 硬碳 → 全电池组装 → 化成 → 循环测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NA-T4', name: '钠电低温性能初测', type: '测试',
+        steps: '组装 → 常温化成 → 低温放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NA-T5', name: '硬碳负极对比', type: '对照',
+        steps: '多种硬碳同工艺制片 → 对钠片组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['neg', 'na', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: ''
+      },
+      {
+        id: 'NA-T6', name: '正极材料合成', type: '合成',
+        steps: '前驱体混合 → 热处理（档位）→ 研磨 → 过筛 → 送表征',
+        resultTag: '待测',
+        roles: ['pre', 'pos'],
+        notes: '温度与时间只写档位'
+      },
+      {
+        id: 'NA-T7', name: '钠电循环寿命测试', type: '测试',
+        steps: '组装 → 化成 → 长循环 → 定期取数',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NA-T8', name: '电解液体系对比', type: '对照',
+        steps: '同批极片 → 不同电解液组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NA-T9', name: '钠电首效改善验证', type: '验证',
+        steps: '不同预处理方案 → 组装 → 测首次效率与后续循环',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'add', 'sep', 'case'],
+        notes: '只记达标与否与趋势'
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 固态电池
+   * ============================================================ */
+  {
+    id: 'SS',
+    code: 'SS',
+    name: '固态电池',
+    desc: '硫化物 / 氧化物 / 聚合物 / 卤化物四类固态电解质',
+    materials: [
+      { role: 'pos',  alias: '固态用正极材料A',      unit: 'g' },
+      { role: 'pos',  alias: '固态用正极材料B',      unit: 'g', needsReview: true },
+      { role: 'pos',  alias: '固态用正极材料C',      unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '锂金属负极',           unit: 'g' },
+      { role: 'neg',  alias: '锂铟合金负极',         unit: 'g' },
+      { role: 'neg',  alias: '硅碳负极',             unit: 'g' },
+      { role: 'ss',   alias: '硫化物固态电解质A',    unit: 'g' },
+      { role: 'ss',   alias: '硫化物固态电解质B',    unit: 'g', needsReview: true },
+      { role: 'ss',   alias: '氧化物固态电解质A',    unit: 'g' },
+      { role: 'ss',   alias: '氧化物固态电解质B',    unit: 'g', needsReview: true },
+      { role: 'ss',   alias: '聚合物固态电解质',     unit: 'g' },
+      { role: 'ss',   alias: '卤化物固态电解质',     unit: 'g' },
+      { role: 'cond', alias: '导电炭黑',             unit: 'g' },
+      { role: 'bind', alias: 'PTFE粘结剂',           unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',           unit: 'g' },
+      { role: 'cf',   alias: '铝箔',                 unit: '张' },
+      { role: 'cf',   alias: '镍网',                 unit: '张' },
+      { role: 'add',  alias: '界面缓冲层材料A',      unit: 'g', needsReview: true },
+      { role: 'add',  alias: '界面润湿剂',           unit: 'mL', needsReview: true },
+      { role: 'sol',  alias: '研磨溶剂',             unit: 'mL' },
+      { role: 'pre',  alias: '电解质合成原料',       unit: 'g', needsReview: true },
+      { role: 'case', alias: '固态模具',             unit: '套' },
+      { role: 'case', alias: '扣式电池壳',           unit: '套' },
+      { role: 'case', alias: '压力夹具',             unit: '套' }
+    ],
+    templates: [
+      {
+        id: 'SS-T1', name: '固态电解质离子导率测试', type: '测试',
+        steps: '电解质压片 → 装对称电池 → 阻抗测试',
+        resultTag: '待测',
+        roles: ['ss', 'case'],
+        notes: '只记结论与对比关系'
+      },
+      {
+        id: 'SS-T2', name: '固态电解质压制工艺验证', type: '验证',
+        steps: '不同压力档位压片 → 观察致密度 → 测导率',
+        resultTag: '待测',
+        roles: ['ss', 'case'],
+        notes: '压力用档位表示（P1/P2/P3）'
+      },
+      {
+        id: 'SS-T3', name: '固态全电池组装', type: '组装',
+        steps: '正极层 → 电解质层 → 负极层 → 压合 → 装夹',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'cond', 'bind', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SS-T4', name: '界面改性对照实验', type: '对照',
+        steps: '有无界面缓冲层两组 → 同条件组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'add', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SS-T5', name: '硫化物电解质热处理验证', type: '合成',
+        steps: '原料混合 → 热处理（档位）→ 研磨 → 测导率',
+        resultTag: '待测',
+        roles: ['ss', 'pre', 'sol'],
+        notes: '温度只写档位 T1/T2/T3'
+      },
+      {
+        id: 'SS-T6', name: '固态电池循环测试', type: '测试',
+        steps: '组装 → 加压 → 常温循环 → 定期取数',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'case'],
+        notes: '重点看界面阻抗增长与衰减'
+      },
+      {
+        id: 'SS-T7', name: '锂金属负极界面观察', type: '表征',
+        steps: '循环后拆解 → 观察界面 → 取样送表征',
+        resultTag: '异常',
+        roles: ['neg', 'case'],
+        notes: '只描述现象与结论'
+      },
+      {
+        id: 'SS-T8', name: '四种固态电解质横向对比', type: '对照',
+        steps: '同条件压片 → 对称电池 → 测导率与稳定性',
+        resultTag: '待测',
+        roles: ['ss', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SS-T9', name: '复合电解质配比探索', type: '验证',
+        steps: '不同配比档位复合 → 压片 → 测导率与机械性',
+        resultTag: '待测',
+        roles: ['ss', 'bind', 'sol', 'case'],
+        notes: '配比用档位编号，不写具体比例'
+      },
+      {
+        id: 'SS-T10', name: '固态电解质与正极兼容性验证', type: '验证',
+        steps: '混合共烧（档位）→ 观察副反应 → 电化学测试',
+        resultTag: '待测',
+        roles: ['pos', 'ss', 'case'],
+        notes: ''
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 氟化碳电池
+   * ============================================================ */
+  {
+    id: 'CF',
+    code: 'CF',
+    name: '氟化碳电池',
+    desc: '一次电池，高比能，注意与电解液匹配',
+    materials: [
+      { role: 'pos',  alias: '氟化碳材料A',        unit: 'g' },
+      { role: 'pos',  alias: '氟化碳材料B',        unit: 'g' },
+      { role: 'pos',  alias: '氟化碳材料C',        unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '锂片',               unit: '片' },
+      { role: 'li',   alias: '锂带',               unit: 'g' },
+      { role: 'ele',  alias: '氟化碳电解液1',      unit: 'mL' },
+      { role: 'ele',  alias: '氟化碳电解液2',      unit: 'mL' },
+      { role: 'ele',  alias: '氟化碳电解液3',      unit: 'mL', needsReview: true },
+      { role: 'sep',  alias: '隔膜',               unit: '张' },
+      { role: 'sep',  alias: '玻璃纤维隔膜',       unit: '张' },
+      { role: 'cond', alias: '导电炭黑',           unit: 'g' },
+      { role: 'cond', alias: '碳纳米管',           unit: 'g' },
+      { role: 'cond', alias: '石墨烯',             unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',         unit: 'g' },
+      { role: 'bind', alias: 'PTFE粘结剂',         unit: 'g' },
+      { role: 'cf',   alias: '铝箔',               unit: '张' },
+      { role: 'cf',   alias: '镍网',               unit: '张' },
+      { role: 'cf',   alias: '不锈钢网',           unit: '张' },
+      { role: 'sol',  alias: 'NMP溶剂',            unit: 'mL' },
+      { role: 'case', alias: '扣式电池壳',         unit: '套' }
+    ],
+    templates: [
+      {
+        id: 'CF-T1', name: '氟化碳放电性能测试', type: '测试',
+        steps: '制片 → 对锂组装 → 静置 → 小电流放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: '一次电池，只在放电方向测试'
+      },
+      {
+        id: 'CF-T2', name: '不同氟化度材料对比', type: '对照',
+        steps: '多种氟化碳同工艺制片 → 同条件组装 → 同条件放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf'],
+        notes: '氟化度用材料编号区分'
+      },
+      {
+        id: 'CF-T3', name: '电解液体系对比', type: '对照',
+        steps: '同批极片 → 不同电解液组装 → 同条件放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'CF-T4', name: '导电剂用量对倍率的影响', type: '验证',
+        steps: '不同导电剂档位制片 → 同条件组装 → 不同倍率放电',
+        resultTag: '待测',
+        roles: ['pos', 'cond', 'bind', 'cf', 'ele', 'sep', 'case'],
+        notes: '用量用档位 D1/D2 表示'
+      },
+      {
+        id: 'CF-T5', name: '大倍率放电验证', type: '测试',
+        steps: '组装 → 静置 → 大倍率放电 → 观察电压平台',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'case'],
+        notes: ''
+      },
+      {
+        id: 'CF-T6', name: '高温放电验证', type: '测试',
+        steps: '组装 → 高温静置 → 高温放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'CF-T7', name: '低温放电验证', type: '测试',
+        steps: '组装 → 低温静置 → 低温放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'CF-T8', name: '粘结剂体系对比', type: '对照',
+        steps: '不同粘结剂制片 → 同条件组装 → 同条件放电',
+        resultTag: '待测',
+        roles: ['pos', 'bind', 'cond', 'cf', 'ele', 'sep', 'case'],
+        notes: ''
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 燃料电池
+   * ============================================================ */
+  {
+    id: 'FC',
+    code: 'FC',
+    name: '燃料电池',
+    desc: 'PEMFC / SOFC / DMFC',
+    materials: [
+      { role: 'cat',  alias: 'Pt/C催化剂',         unit: 'mg' },
+      { role: 'cat',  alias: '阳极催化剂',         unit: 'mg' },
+      { role: 'cat',  alias: '合金催化剂',         unit: 'mg', needsReview: true },
+      { role: 'mem',  alias: '质子交换膜A',        unit: '张' },
+      { role: 'mem',  alias: '质子交换膜B',        unit: '张' },
+      { role: 'mem',  alias: '阴离子交换膜',       unit: '张' },
+      { role: 'mem',  alias: '复合膜',             unit: '张', needsReview: true },
+      { role: 'oth',  alias: '气体扩散层',         unit: '张' },
+      { role: 'oth',  alias: '碳纸',               unit: '张' },
+      { role: 'oth',  alias: '碳布',               unit: '张' },
+      { role: 'oth',  alias: '双极板',             unit: '片' },
+      { role: 'bind', alias: 'Nafion溶液',         unit: 'mL' },
+      { role: 'bind', alias: '离聚物溶液',         unit: 'mL', needsReview: true },
+      { role: 'gas',  alias: '氢气',               unit: 'L' },
+      { role: 'gas',  alias: '氧气',               unit: 'L' },
+      { role: 'gas',  alias: '空气',               unit: 'L' },
+      { role: 'gas',  alias: '氮气',               unit: 'L' },
+      { role: 'sol',  alias: '异丙醇',             unit: 'mL' },
+      { role: 'sol',  alias: '去离子水',           unit: 'mL' },
+      { role: 'pre',  alias: 'SOFC电解质粉体',     unit: 'g', needsReview: true },
+      { role: 'pre',  alias: 'SOFC阳极粉体',       unit: 'g', needsReview: true },
+      { role: 'case', alias: '单电池夹具',         unit: '套' },
+      { role: 'case', alias: '密封垫片',           unit: '片' },
+      { role: 'case', alias: '集流板',             unit: '片' }
+    ],
+    templates: [
+      {
+        id: 'FC-T1', name: '膜电极制备', type: '组装',
+        steps: '催化剂浆料配制 → 喷涂/涂布到膜 → 热压 → 装夹',
+        resultTag: '待测',
+        roles: ['cat', 'mem', 'bind', 'sol', 'oth', 'case'],
+        notes: '载量用档位表示'
+      },
+      {
+        id: 'FC-T2', name: '极化曲线测试', type: '测试',
+        steps: '单电池装夹 → 活化 → 测极化曲线',
+        resultTag: '待测',
+        roles: ['cat', 'mem', 'gas', 'oth', 'case'],
+        notes: ''
+      },
+      {
+        id: 'FC-T3', name: '催化剂对比实验', type: '对照',
+        steps: '不同催化剂同工艺制 MEA → 同条件测试',
+        resultTag: '待测',
+        roles: ['cat', 'mem', 'bind', 'sol', 'oth', 'case'],
+        notes: '只记载量档位与结论'
+      },
+      {
+        id: 'FC-T4', name: '耐久性测试', type: '测试',
+        steps: '装夹 → 活化 → 长时恒流运行 → 定期测极化',
+        resultTag: '待测',
+        roles: ['cat', 'mem', 'gas', 'case'],
+        notes: '记录衰减趋势'
+      },
+      {
+        id: 'FC-T5', name: '膜材料对比', type: '对照',
+        steps: '不同膜同工艺制 MEA → 同条件测试',
+        resultTag: '待测',
+        roles: ['cat', 'mem', 'bind', 'oth', 'case'],
+        notes: ''
+      },
+      {
+        id: 'FC-T6', name: 'ECSA 测试', type: '测试',
+        steps: '装夹 → 循环伏安 → 计算电化学活性面积',
+        resultTag: '待测',
+        roles: ['cat', 'mem', 'gas', 'case'],
+        notes: '只记对比结论'
+      },
+      {
+        id: 'FC-T7', name: '气体扩散层对比', type: '对照',
+        steps: '不同 GDL 组装 → 同条件测极化与阻抗',
+        resultTag: '待测',
+        roles: ['oth', 'cat', 'mem', 'gas', 'case'],
+        notes: ''
+      },
+      {
+        id: 'FC-T8', name: 'SOFC 单电池测试', type: '测试',
+        steps: '粉体压片 → 烧结（档位）→ 组装 → 高温测试',
+        resultTag: '待测',
+        roles: ['pre', 'gas', 'case'],
+        notes: '烧结温度只写档位'
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 热电池
+   * ============================================================ */
+  {
+    id: 'TB',
+    code: 'TB',
+    name: '热电池',
+    desc: '熔盐电解质，激活后短时高功率输出',
+    materials: [
+      { role: 'pos',  alias: '热电池正极材料A',    unit: 'g' },
+      { role: 'pos',  alias: '热电池正极材料B',    unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '热电池负极材料A',    unit: 'g' },
+      { role: 'neg',  alias: '热电池负极材料B',    unit: 'g', needsReview: true },
+      { role: 'ss',   alias: '熔盐电解质A',        unit: 'g' },
+      { role: 'ss',   alias: '熔盐电解质B',        unit: 'g', needsReview: true },
+      { role: 'ss',   alias: '电解质粘结剂',       unit: 'g' },
+      { role: 'oth',  alias: '加热片',             unit: '片' },
+      { role: 'oth',  alias: '引燃条',             unit: '个' },
+      { role: 'oth',  alias: '保温材料',           unit: 'g' },
+      { role: 'oth',  alias: '隔热垫',             unit: '片' },
+      { role: 'bind', alias: '粘结剂',             unit: 'g' },
+      { role: 'cf',   alias: '集流体',             unit: '张' },
+      { role: 'cf',   alias: '镍带',               unit: 'g' },
+      { role: 'sol',  alias: '成型溶剂',           unit: 'mL' },
+      { role: 'pre',  alias: '熔盐原料',           unit: 'g', needsReview: true },
+      { role: 'case', alias: '单体壳',             unit: '套' },
+      { role: 'case', alias: '绝缘环',             unit: '个' },
+      { role: 'case', alias: '盖板',               unit: '个' },
+      { role: 'case', alias: '高温胶',             unit: 'g' }
+    ],
+    templates: [
+      {
+        id: 'TB-T1', name: '单体电池组装', type: '组装',
+        steps: '正极片 → 电解质片 → 负极片 → 叠装 → 装壳',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'oth', 'case'],
+        notes: ''
+      },
+      {
+        id: 'TB-T2', name: '激活与放电测试', type: '测试',
+        steps: '装点火装置 → 激活 → 记录电压与放电曲线',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'oth', 'case'],
+        notes: '重点关注激活时间与峰值功率'
+      },
+      {
+        id: 'TB-T3', name: '电解质配比对照', type: '对照',
+        steps: '不同熔盐配比 → 同工艺组装 → 同条件激活测试',
+        resultTag: '待测',
+        roles: ['ss', 'pos', 'neg', 'case'],
+        notes: '配比只写组别编号'
+      },
+      {
+        id: 'TB-T4', name: '保温结构效果验证', type: '验证',
+        steps: '不同保温结构组 → 同条件激活 → 比较工作时间',
+        resultTag: '待测',
+        roles: ['oth', 'pos', 'neg', 'ss', 'case'],
+        notes: ''
+      },
+      {
+        id: 'TB-T5', name: '加热片配方验证', type: '验证',
+        steps: '不同加热片档位 → 组装 → 测激活速度',
+        resultTag: '待测',
+        roles: ['oth', 'ss', 'case'],
+        notes: ''
+      },
+      {
+        id: 'TB-T6', name: '高温存储后性能验证', type: '测试',
+        steps: '组装 → 高温存储 → 激活测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'oth', 'case'],
+        notes: ''
+      },
+      {
+        id: 'TB-T7', name: '大电流放电验证', type: '测试',
+        steps: '组装 → 激活 → 大电流放电 → 记录平台与时间',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ss', 'case'],
+        notes: ''
+      },
+      {
+        id: 'TB-T8', name: '熔盐电解质制备', type: '合成',
+        steps: '原料称量 → 熔融混匀 → 冷却研磨 → 过筛',
+        resultTag: '待测',
+        roles: ['pre', 'ss'],
+        notes: '温度只写档位'
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 超级电容器
+   * ============================================================ */
+  {
+    id: 'SC',
+    code: 'SC',
+    name: '超级电容器',
+    desc: '双电层 / 赝电容 / 混合储能',
+    materials: [
+      { role: 'pos',  alias: '活性炭A',            unit: 'g' },
+      { role: 'pos',  alias: '活性炭B',            unit: 'g', needsReview: true },
+      { role: 'pos',  alias: '石墨烯',             unit: 'g' },
+      { role: 'pos',  alias: '碳纳米管',           unit: 'g' },
+      { role: 'pos',  alias: '赝电容材料A',        unit: 'g' },
+      { role: 'pos',  alias: '赝电容材料B',        unit: 'g', needsReview: true },
+      { role: 'pos',  alias: '导电聚合物',         unit: 'g' },
+      { role: 'ele',  alias: '有机电解液',         unit: 'mL' },
+      { role: 'ele',  alias: '水系电解液-酸性',    unit: 'mL' },
+      { role: 'ele',  alias: '水系电解液-碱性',    unit: 'mL' },
+      { role: 'ele',  alias: '水系电解液-中性',    unit: 'mL' },
+      { role: 'ele',  alias: '离子液体电解液',     unit: 'mL' },
+      { role: 'sep',  alias: '电容隔膜',           unit: '张' },
+      { role: 'sep',  alias: '玻璃纤维隔膜',       unit: '张' },
+      { role: 'cond', alias: '导电炭黑',           unit: 'g' },
+      { role: 'bind', alias: 'PTFE粘结剂',         unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',         unit: 'g' },
+      { role: 'cf',   alias: '铝箔',               unit: '张' },
+      { role: 'cf',   alias: '泡沫镍',             unit: '张' },
+      { role: 'cf',   alias: '不锈钢网',           unit: '张' },
+      { role: 'sol',  alias: '去离子水',           unit: 'mL' },
+      { role: 'case', alias: '扣式电池壳',         unit: '套' }
+    ],
+    templates: [
+      {
+        id: 'SC-T1', name: '极片制备', type: '组装',
+        steps: '活性材料 + 导电剂 + 粘结剂混料 → 辊压 → 裁片 → 称重',
+        resultTag: '待测',
+        roles: ['pos', 'cond', 'bind', 'cf'],
+        notes: ''
+      },
+      {
+        id: 'SC-T2', name: '扣式对称电容组装', type: '组装',
+        steps: '两片同质极片 → 隔膜 → 电解液 → 封装',
+        resultTag: '待测',
+        roles: ['pos', 'ele', 'sep', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SC-T3', name: '循环伏安测试', type: '测试',
+        steps: '组装完成 → 静置 → 不同扫速 CV',
+        resultTag: '待测',
+        roles: ['pos', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SC-T4', name: '恒流充放电与循环', type: '测试',
+        steps: '组装 → 静置 → 恒流充放电 → 循环若干次',
+        resultTag: '待测',
+        roles: ['pos', 'ele', 'sep', 'case'],
+        notes: '记录容量保持趋势'
+      },
+      {
+        id: 'SC-T5', name: '水系/有机系对比', type: '对照',
+        steps: '同批极片 → 两种电解液分别组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SC-T6', name: '活性炭材料对比', type: '对照',
+        steps: '多种活性炭同工艺制片 → 组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'cond', 'bind', 'ele', 'sep', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SC-T7', name: '赝电容材料性能验证', type: '测试',
+        steps: '赝电容材料制片 → 组装 → CV + 充放电',
+        resultTag: '待测',
+        roles: ['pos', 'cond', 'bind', 'ele', 'sep', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'SC-T8', name: '阻抗谱测试', type: '测试',
+        steps: '组装 → 静置 → EIS 测试 → 拟合分析',
+        resultTag: '待测',
+        roles: ['pos', 'ele', 'sep', 'case'],
+        notes: '只记对比结论'
+      }
+    ]
+  },
+
+  /* ============================================================
+   * 新型电池
+   * ============================================================ */
+  {
+    id: 'NEW',
+    code: 'NEW',
+    name: '新型电池',
+    desc: '锂硫 / 金属空气 / 水系锌离子等探索方向',
+    materials: [
+      { role: 'pos',  alias: '硫正极材料A',        unit: 'g' },
+      { role: 'pos',  alias: '硫正极材料B',        unit: 'g', needsReview: true },
+      { role: 'pos',  alias: '空气电极材料',       unit: 'g' },
+      { role: 'pos',  alias: '锌离子正极材料A',    unit: 'g' },
+      { role: 'pos',  alias: '锌离子正极材料B',    unit: 'g', needsReview: true },
+      { role: 'neg',  alias: '锂金属负极',         unit: 'g' },
+      { role: 'neg',  alias: '锌片',               unit: '片' },
+      { role: 'neg',  alias: '锌箔',               unit: '张' },
+      { role: 'ele',  alias: '锂硫电解液1',        unit: 'mL' },
+      { role: 'ele',  alias: '锂硫电解液2',        unit: 'mL' },
+      { role: 'ele',  alias: '水系电解液-中性',    unit: 'mL' },
+      { role: 'ele',  alias: '水系电解液-酸性',    unit: 'mL' },
+      { role: 'ele',  alias: '碱性电解液',         unit: 'mL' },
+      { role: 'sep',  alias: '功能隔膜A',          unit: '张', needsReview: true },
+      { role: 'sep',  alias: '功能隔膜B',          unit: '张', needsReview: true },
+      { role: 'sep',  alias: '玻璃纤维隔膜',       unit: '张' },
+      { role: 'cond', alias: '导电炭黑',           unit: 'g' },
+      { role: 'cond', alias: '碳纳米管',           unit: 'g' },
+      { role: 'bind', alias: 'PVDF粘结剂',         unit: 'g' },
+      { role: 'bind', alias: 'PTFE粘结剂',         unit: 'g' },
+      { role: 'cf',   alias: '碳纸',               unit: '张' },
+      { role: 'cf',   alias: '不锈钢网',           unit: '张' },
+      { role: 'cf',   alias: '钛网',               unit: '张' },
+      { role: 'gas',  alias: '氧气',               unit: 'L' },
+      { role: 'sol',  alias: 'NMP溶剂',            unit: 'mL' },
+      { role: 'case', alias: '扣式电池壳',         unit: '套' }
+    ],
+    templates: [
+      {
+        id: 'NEW-T1', name: '锂硫电池组装与测试', type: '测试',
+        steps: '硫正极制片 → 对锂组装 → 静置 → 充放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'bind', 'cf', 'case'],
+        notes: '注意记录多硫化物穿梭现象'
+      },
+      {
+        id: 'NEW-T2', name: '水系锌离子电池测试', type: '测试',
+        steps: '正极制片 → 对锌片组装 → 加电解液 → 充放电',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NEW-T3', name: '金属空气电池测试', type: '测试',
+        steps: '空气电极制备 → 组装 → 通氧 → 放电测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'gas', 'cf', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NEW-T4', name: '隔膜改性对照', type: '对照',
+        steps: '不同隔膜两组 → 同条件组装 → 同条件测试',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NEW-T5', name: '硫正极载硫量验证', type: '验证',
+        steps: '不同载硫档位制片 → 组装 → 测容量与循环',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'cond', 'cf', 'case'],
+        notes: '载量用档位，不写具体数值'
+      },
+      {
+        id: 'NEW-T6', name: '锌负极沉积形貌观察', type: '表征',
+        steps: '循环后拆解 → 观察锌沉积形貌 → 拍照记录',
+        resultTag: '异常',
+        roles: ['neg', 'case'],
+        notes: '只描述现象'
+      },
+      {
+        id: 'NEW-T7', name: '电解液添加剂筛选', type: '对照',
+        steps: '基础电解液 + 不同添加剂 → 组装 → 循环对比',
+        resultTag: '待测',
+        roles: ['pos', 'neg', 'ele', 'sep', 'case'],
+        notes: ''
+      },
+      {
+        id: 'NEW-T8', name: '空气电极制备与优化', type: '验证',
+        steps: '不同配方压片 → 组装 → 通氧放电 → 比较',
+        resultTag: '待测',
+        roles: ['pos', 'cond', 'bind', 'cf', 'gas', 'case'],
+        notes: ''
+      }
+    ]
+  }
+];
+
+/* ===================== 通用常量 ===================== */
+const UNITS = ['g', 'mg', 'mL', 'L', '片', '张', '个', '套', 'kg'];
+const EXP_TYPES = ['配方', '合成', '组装', '测试', '表征', '对照', '验证', '重复'];
+const STATUSES = ['完成', '失败', '进行中'];
+const RESULT_TAGS = ['达标', '未达标', '待测', '异常'];
+
+/* ===================== 便捷方法 ===================== */
+
+function getSystem(id) {
+  return SYSTEMS.find((s) => s.id === id) || null;
+}
+
+function systemName(id) {
+  const s = getSystem(id);
+  return s ? s.name : (id || '');
+}
+
+function materialsOfSystem(systemId) {
+  const s = getSystem(systemId);
+  return s ? s.materials : [];
+}
+
+function templatesOfSystem(systemId) {
+  const s = getSystem(systemId);
+  return s ? s.templates : [];
+}
+
+/** 生成物料代号前缀：体系码 + 用途，如 LILT-POS */
+function suggestMaterialCode(roleId, systemId) {
+  const sys = getSystem(systemId);
+  const sysPrefix = sys ? sys.code.replace(/-/g, '') : 'GEN';
+  return `${sysPrefix}-${(roleId || 'oth').toUpperCase()}`;
+}
+
+/**
+ * 预设物料的确定性代号。
+ * 关键：手机端和内网电脑端必须用【同一套规则】算出同一个代号，
+ * 否则同一种料在两边会被当成两种，导入时无法自动对应。
+ *
+ * 规则：体系码(去横线) + "-" + 用途大写 + 两位序号
+ * 例：LI-LT 体系第 3 个正极 → LILT-POS03
+ */
+function presetMaterialCode(systemId, index, roleId) {
+  const sys = getSystem(systemId);
+  const sysPrefix = sys ? sys.code.replace(/-/g, '') : 'GEN';
+  return `${sysPrefix}-${(roleId || 'oth').toUpperCase()}${String(index + 1).padStart(2, '0')}`;
+}
+
+/** 把某体系的预设物料展开成带代号的对象数组 */
+function expandSystemMaterials(systemId) {
+  const sys = getSystem(systemId);
+  if (!sys) return [];
+  return sys.materials.map((m, i) => ({
+    ...m,
+    code: presetMaterialCode(systemId, i, m.role),
+    system: systemId,
+    stock: 0,
+    safetyStock: 0,
+    status: '启用'
+  }));
+}
+
+/** 按代号查预设物料（跨所有体系） */
+function findPresetMaterial(code) {
+  for (const sys of SYSTEMS) {
+    const hit = expandSystemMaterials(sys.id).find((m) => m.code === code);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/** 统计：给自检和文档用 */
+function presetStats() {
+  const perSystem = SYSTEMS.map((s) => ({
+    id: s.id,
+    name: s.name,
+    materials: s.materials.length,
+    templates: s.templates.length,
+    needsReview: s.materials.filter((m) => m.needsReview).length
+      + s.templates.filter((t) => t.needsReview).length
+  }));
+  return {
+    systems: SYSTEMS.length,
+    materials: perSystem.reduce((a, b) => a + b.materials, 0),
+    templates: perSystem.reduce((a, b) => a + b.templates, 0),
+    needsReview: perSystem.reduce((a, b) => a + b.needsReview, 0),
+    perSystem
+  };
+}
+
+</script>
+<script>
+(function () {
+"use strict";
+/**
+ * 手机端记录 App（离线）
+ *
+ * 定位：只在手机上"记"，不管库存、不做汇总。
+ *   手机记录 → 导出文件 → 内网导入终端/U盘 → 内网电脑「导入记录」时统一扣库存
+ *
+ * 为什么手机不扣库存：
+ *   1) 手机上没有可信的库存数据，各记各的必然对不上；
+ *   2) 库存是"实验室的账"，应该由内网那台机器统一管；
+ *   3) 手机断网也能用，不需要实时同步。
+ *
+ * 数据类型：全部存 localStorage，导出时打包成 lab.notebook.v1 格式，
+ * 与内网电脑端完全兼容，内网导入时能自动去重并扣库存。
+ */
+
+/* ===================== 基础工具 ===================== */
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+function store(key, val) {
+  if (val === undefined) {
+    try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+  }
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { console.error(e); }
+  return val;
+}
+
+function uid() {
+  try {
+    if (window.crypto && window.crypto.getRandomValues) {
+      const b = new Uint8Array(16);
+      window.crypto.getRandomValues(b);
+      return Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) { /* 降级 */ }
+  return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+function today() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function fmtTime(v) {
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '';
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function r3(n) { return Math.round((Number(n) || 0) * 1000) / 1000; }
+
+function esc(s) {
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function toast(msg, type = '') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.className = ''; }, 2600);
+}
+
+/* ===================== 本机状态 ===================== */
+
+const App = {
+  me: null,          // { empNo, name, system }
+  records: [],       // 本机所有记录
+  draft: null,       // 正在编辑的记录
+
+  load() {
+    this.me = store('pn_me') || null;
+    this.records = store('pn_records') || [];
+  },
+
+  saveMe(me) {
+    this.me = me;
+    store('pn_me', me);
+  },
+
+  saveRecords() {
+    store('pn_records', this.records);
+  },
+
+  /** 把一条记录存入本机（同 uid 覆盖） */
+  upsert(rec) {
+    const i = this.records.findIndex((x) => x.uid === rec.uid);
+    if (i >= 0) this.records[i] = rec;
+    else this.records.unshift(rec);
+    this.records.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    this.saveRecords();
+  },
+
+  /** 待导出的记录（还没有导出过的） */
+  pending() {
+    return this.records.filter((r) => !r.exported);
+  }
+};
+
+/* ===================== 页面切换 ===================== */
+
+let currentTab = 'new';
+
+function showTab(name) {
+  currentTab = name;
+  $$('.tab').forEach((t) => t.classList.toggle('on', t.dataset.tab === name));
+  $$('.pane').forEach((p) => p.classList.toggle('on', p.id === 'pane-' + name));
+  if (name === 'new') renderNew();
+  if (name === 'list') renderList();
+  if (name === 'me') renderMe();
+}
+
+/* ===================== 新建记录 ===================== */
+
+/**
+ * 编辑中的记录（草稿）
+ * { uid, date, system, project, type, steps, status, resultTag, notes, materials: [{code, alias, qty, unit}] }
+ */
+function newDraft() {
+  return {
+    uid: uid(),
+    date: today(),
+    system: (App.me && App.me.system) || 'LI-LT',
+    project: '',
+    type: '测试',
+    steps: '',
+    status: '完成',
+    resultTag: '待测',
+    notes: '',
+    materials: [],
+    createdAt: new Date().toISOString(),
+    revision: 1
+  };
+}
+
+function renderNew() {
+  const pane = $('#pane-new');
+  if (!App.draft) App.draft = newDraft();
+  const d = App.draft;
+  const sys = getSystem(d.system) || SYSTEMS[0];
+  const tpls = templatesOfSystem(d.system);
+
+  pane.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">体系</div>
+      <select id="fSystem">
+        ${SYSTEMS.map((s) => `<option value="${s.id}" ${s.id === d.system ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">常用实验（点一下自动填好）</div>
+      <div class="tpls">
+        ${tpls.length ? tpls.map((t) => `
+          <div class="tpl" data-tpl="${t.id}">
+            <div class="tpl-n">${esc(t.name)}</div>
+            <div class="tpl-m">${esc(t.type)}</div>
+          </div>`).join('') : '<div class="muted small">该体系暂无模板，可手动填写</div>'}
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">基本信息</div>
+      <label class="fld"><span>日期</span><input type="date" id="fDate" value="${esc(d.date)}" /></label>
+      <label class="fld"><span>项目 / 课题</span><input type="text" id="fProject" value="${esc(d.project)}" placeholder="如：高电压正极" /></label>
+      <label class="fld"><span>实验类型</span>
+        <select id="fType">${EXP_TYPES.map((t) => `<option value="${t}" ${t === d.type ? 'selected' : ''}>${t}</option>`).join('')}</select>
+      </label>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">用了哪些料</div>
+      <div id="matList"></div>
+      <button class="btn ghost sm" id="btnAddMat">＋ 加一种料</button>
+      <div class="muted small" style="margin-top:8px">
+        手机只记用量，<b>不扣库存</b>。导入内网电脑时才会自动扣。
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">流程与结论</div>
+      <label class="fld"><span>步骤摘要（只写流程，不写参数）</span>
+        <textarea id="fSteps" rows="2" placeholder="混合 → 涂布 → 组装">${esc(d.steps)}</textarea>
+      </label>
+      <label class="fld"><span>备注</span>
+        <textarea id="fNotes" rows="2" placeholder="现象 / 异常">${esc(d.notes)}</textarea>
+      </label>
+      <div class="grid2">
+        <label class="fld"><span>状态</span>
+          <select id="fStatus">${STATUSES.map((s) => `<option value="${s}" ${s === d.status ? 'selected' : ''}>${s}</option>`).join('')}</select>
+        </label>
+        <label class="fld"><span>结果</span>
+          <select id="fResult">${RESULT_TAGS.map((s) => `<option value="${s}" ${s === d.resultTag ? 'selected' : ''}>${s}</option>`).join('')}</select>
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn big" id="btnSave">保存到手机</button>
+      <button class="btn gray" id="btnReset">清空重填</button>
+    </div>
+  `;
+
+  // 体系切换
+  $('#fSystem').addEventListener('change', (e) => {
+    App.draft.system = e.target.value;
+    // 换体系时清掉不匹配的物料
+    App.draft.materials = [];
+    App.draft.steps = '';
+    renderNew();
+  });
+
+  // 模板
+  $$('.tpl', pane).forEach((node) => {
+    node.addEventListener('click', () => {
+      const t = tpls.find((x) => x.id === node.dataset.tpl);
+      if (!t) return;
+      App.draft.type = t.type;
+      App.draft.steps = t.steps;
+      App.draft.notes = t.notes || '';
+      App.draft.resultTag = t.resultTag || '待测';
+      App.draft.materials = materialRowsForTemplate(t, App.draft.system);
+      renderNew();
+      toast(`已套用「${t.name}」`, 'ok');
+    });
+  });
+
+  // 基本字段
+  const bind = (sel, key) => {
+    const node = $(sel);
+    if (node) node.addEventListener('input', (e) => { App.draft[key] = e.target.value; });
+  };
+  bind('#fDate', 'date');
+  bind('#fProject', 'project');
+  bind('#fSteps', 'steps');
+  bind('#fNotes', 'notes');
+  $('#fType').addEventListener('change', (e) => { App.draft.type = e.target.value; });
+  $('#fStatus').addEventListener('change', (e) => { App.draft.status = e.target.value; });
+  $('#fResult').addEventListener('change', (e) => { App.draft.resultTag = e.target.value; });
+
+  $('#btnAddMat').addEventListener('click', () => {
+    App.draft.materials.push({ role: '', code: '', alias: '', qty: '', unit: '' });
+    renderMatList();
+  });
+
+  $('#btnSave').addEventListener('click', saveDraft);
+  $('#btnReset').addEventListener('click', () => {
+    App.draft = newDraft();
+    renderNew();
+    toast('已清空');
+  });
+
+  renderMatList();
+}
+
+/** 按模板的用途分类，预先建好空白物料行 */
+function materialRowsForTemplate(t, systemId) {
+  return (t.roles || []).map((role) => ({ role, code: '', alias: '', qty: '', unit: '' }));
+}
+
+function renderMatList() {
+  const box = $('#matList');
+  if (!box) return;
+  const d = App.draft;
+
+  if (!d.materials.length) {
+    box.innerHTML = '<div class="muted small" style="padding:6px 0">还没有料。选上面的模板会自动列出需要准备的分类。</div>';
+    return;
+  }
+
+  box.innerHTML = '';
+  d.materials.forEach((row, i) => {
+    const opts = materialsForRole(row.role, d.system);
+    const wrap = document.createElement('div');
+    wrap.className = 'mat-row';
+    wrap.innerHTML = `
+      <div class="mat-head">
+        <span class="role">${esc(ROLE_NAME[row.role] || '自选')}</span>
+        <button class="del" data-del="${i}">×</button>
+      </div>
+      <div class="mat-body">
+        <select data-code="${i}">
+          <option value="">${opts.length ? '— 选择物料 —' : '该分类暂无物料'}</option>
+          ${opts.map((m) => `<option value="${esc(m.code)}" ${m.code === row.code ? 'selected' : ''}>${esc(m.alias)}</option>`).join('')}
+        </select>
+        <input type="number" step="0.001" min="0" placeholder="用量" value="${esc(row.qty)}" data-qty="${i}" />
+        <span class="unit">${esc(row.unit || '')}</span>
+      </div>`;
+    box.appendChild(wrap);
+  });
+
+  box.querySelectorAll('[data-code]').forEach((sel) => {
+    sel.addEventListener('change', (e) => {
+      const i = Number(sel.dataset.code);
+      const code = e.target.value;
+      const mat = findMaterial(code, d.system);
+      d.materials[i].code = code;
+      d.materials[i].alias = mat ? mat.alias : '';
+      d.materials[i].unit = mat ? mat.unit : '';
+      renderMatList();
+    });
+  });
+
+  box.querySelectorAll('[data-qty]').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      d.materials[Number(inp.dataset.qty)].qty = e.target.value;
+    });
+  });
+
+  box.querySelectorAll('[data-del]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      d.materials.splice(Number(btn.dataset.del), 1);
+      renderMatList();
+    });
+  });
+}
+
+/**
+ * 从预设物料库找物料。
+ * 手机上没有"实际库存"概念，物料库只是"可选清单"；
+ * 有没有货由内网电脑核对。代号规则与电脑端完全一致（presetMaterialCode），
+ * 这样导入时能自动对应上。
+ */
+function findMaterial(code, systemId) {
+  return expandSystemMaterials(systemId).find((m) => m.code === code) || null;
+}
+
+function materialsForRole(roleId, systemId) {
+  return expandSystemMaterials(systemId).filter((m) => !roleId || m.role === roleId);
+}
+
+function saveDraft() {
+  const d = App.draft;
+  if (!d.date) return toast('请选择日期', 'err');
+  const mats = d.materials.filter((m) => m.code && Number(m.qty) > 0);
+  if (!mats.length) return toast('请至少填写一种料的用量', 'err');
+
+  const rec = {
+    ...d,
+    materials: mats.map((m) => ({
+      code: m.code, alias: m.alias, qty: r3(m.qty), unit: m.unit
+    })),
+    savedAt: new Date().toISOString(),
+    exported: false
+  };
+  App.upsert(rec);
+  App.draft = newDraft();
+  renderNew();
+  toast('已保存到手机，记得导出', 'ok');
+}
+
+/* ===================== 记录列表 / 导出 ===================== */
+
+function renderList() {
+  const pane = $('#pane-list');
+  const list = App.records;
+  const pending = App.pending();
+
+  pane.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">导出到内网</div>
+      <div class="muted small" style="margin-bottom:10px">
+        手机不能直接连内网。请把导出的文件通过<b>导入终端或 U 盘</b>交给内网电脑，
+        在内网程序的「导入记录」里导入，那时才会扣库存。
+      </div>
+      <button class="btn big" id="btnExport" ${pending.length ? '' : 'disabled'}>
+        导出 ${pending.length} 条待传记录
+      </button>
+      <div class="muted small" style="margin-top:8px">
+        共 ${list.length} 条记录，其中 ${pending.length} 条还没导出。
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">本机记录</div>
+      ${list.length ? list.map((r) => `
+        <div class="rec">
+          <div class="rec-head">
+            <span class="rec-sys">${esc(systemName(r.system))}</span>
+            <span class="rec-date">${esc(r.date)}</span>
+          </div>
+          <div class="rec-t">${esc(r.project || '（未填项目）')} · ${esc(r.type)}</div>
+          <div class="rec-m">
+            ${(r.materials || []).length} 种料
+            · ${esc(r.resultTag || '')}
+            ${r.exported ? '<span class="tag ok">已导出</span>' : '<span class="tag warn">待导出</span>'}
+          </div>
+          <div class="rec-ops">
+            <button class="btn gray sm" data-edit="${esc(r.uid)}">改</button>
+            <button class="btn danger sm" data-del="${esc(r.uid)}">删</button>
+          </div>
+        </div>`).join('') : '<div class="muted small">还没有记录。</div>'}
+    </div>
+  `;
+
+  $('#btnExport').addEventListener('click', exportRecords);
+
+  pane.querySelectorAll('[data-edit]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const r = App.records.find((x) => x.uid === b.dataset.edit);
+      if (!r) return;
+      App.draft = JSON.parse(JSON.stringify(r));
+      showTab('new');
+    });
+  });
+
+  pane.querySelectorAll('[data-del]').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (!confirm('删除这条记录？删除后还能重新填，但导出的历史不受影响。')) return;
+      App.records = App.records.filter((x) => x.uid !== b.dataset.del);
+      App.saveRecords();
+      renderList();
+      toast('已删除');
+    });
+  });
+}
+
+function exportRecords() {
+  const pending = App.pending();
+  if (!pending.length) return toast('没有待导出的记录', 'err');
+
+  const payload = {
+    schema: 'lab.notebook.v1',
+    from: 'phone',
+    exported_at: new Date().toISOString(),
+    operator: {
+      empNo: App.me.empNo,
+      name: App.me.name,
+      system: App.me.system || ''
+    },
+    experiments: pending.map((r) => ({
+      uid: r.uid,
+      revision: r.revision || 1,
+      expCode: r.expCode || '',        // 手机不生成正式编号，内网导入时补
+      date: r.date,
+      system: r.system,
+      project: r.project || '',
+      type: r.type,
+      status: r.status,
+      resultTag: r.resultTag,
+      materials: r.materials || [],
+      steps: r.steps || '',
+      notes: r.notes || ''
+    }))
+  };
+
+  const text = JSON.stringify(payload, null, 2);
+  const fname = `待传记录_${App.me.empNo}_${stamp()}.json`;
+
+  downloadOrShare(text, fname, () => {
+    // 标记为已导出
+    pending.forEach((r) => { r.exported = true; r.exportedAt = new Date().toISOString(); });
+    App.saveRecords();
+    renderList();
+    toast(`已导出 ${pending.length} 条，请传到内网`, 'ok');
+  });
+}
+
+function stamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+/**
+ * 手机上导出文件的方式，按环境尝试：
+ *   1) 支持文件系统访问 API → 弹保存框
+ *   2) 普通浏览器/WebView → a[download]
+ *   3) 微信内打开 → 提示用浏览器打开
+ */
+function downloadOrShare(text, filename, onDone) {
+  const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+  if (isWeChat) {
+    toast('微信里不能保存文件，请点右上角用浏览器打开', 'err');
+    return;
+  }
+
+  try {
+    const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 150);
+    if (onDone) onDone();
+  } catch (e) {
+    // 极老环境：退化成可全选复制
+    showTextFallback(text, filename);
+  }
+}
+
+/** 兜底：把内容显示出来，让用户自己复制或截图 */
+function showTextFallback(text, filename) {
+  const box = $('#fallback');
+  $('#fallbackName').textContent = filename;
+  $('#fallbackText').value = text;
+  box.classList.add('show');
+}
+
+/* ===================== 我的 ===================== */
+
+function renderMe() {
+  const pane = $('#pane-me');
+  const me = App.me || {};
+  pane.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">我的信息</div>
+      <label class="fld"><span>工号</span><input type="text" id="mEmpNo" value="${esc(me.empNo || '')}" placeholder="如 U023" /></label>
+      <label class="fld"><span>姓名</span><input type="text" id="mName" value="${esc(me.name || '')}" placeholder="张三" /></label>
+      <label class="fld"><span>主攻体系</span>
+        <select id="mSystem">
+          <option value="">— 选择 —</option>
+          ${SYSTEMS.map((s) => `<option value="${s.id}" ${s.id === me.system ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}
+        </select>
+      </label>
+      <button class="btn" id="btnSaveMe">保存</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">这台手机上的数据</div>
+      <div class="muted small">记录 ${App.records.length} 条，其中 ${App.pending().length} 条待导出。</div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn gray" id="btnExportAll">导出全部记录（含已导出的）</button>
+        <button class="btn danger" id="btnClearAll">清空本机记录</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">使用须知</div>
+      <div class="muted small" style="line-height:1.9">
+        1. 手机上<b>只记录、不管库存</b>。库存由内网电脑统一管理。<br>
+        2. 手机不能连内网，记录靠<b>导出文件 + 导入终端/U盘</b>传进去。<br>
+        3. 清空或卸载 App 会丢本机记录，导出后请尽快传到内网。<br>
+        4. 不要填具体配方比例、工艺温度、比能量数值。
+      </div>
+    </div>
+  `;
+
+  $('#btnSaveMe').addEventListener('click', () => {
+    const empNo = $('#mEmpNo').value.trim();
+    const name = $('#mName').value.trim();
+    const system = $('#mSystem').value;
+    if (!empNo) return toast('请填工号', 'err');
+    if (!name) return toast('请填姓名', 'err');
+    if (!/^[A-Za-z0-9_-]{1,20}$/.test(empNo)) return toast('工号只能用字母数字下划线', 'err');
+    App.saveMe({ empNo, name, system });
+    toast('已保存', 'ok');
+    showTab('new');
+  });
+
+  $('#btnExportAll').addEventListener('click', () => {
+    if (!App.records.length) return toast('没有记录', 'err');
+    const all = App.records;
+    const payload = {
+      schema: 'lab.notebook.v1',
+      from: 'phone',
+      exported_at: new Date().toISOString(),
+      operator: { empNo: App.me.empNo, name: App.me.name, system: App.me.system || '' },
+      experiments: all.map((r) => ({
+        uid: r.uid, revision: r.revision || 1, expCode: r.expCode || '',
+        date: r.date, system: r.system, project: r.project || '', type: r.type,
+        status: r.status, resultTag: r.resultTag, materials: r.materials || [],
+        steps: r.steps || '', notes: r.notes || ''
+      }))
+    };
+    downloadOrShare(JSON.stringify(payload, null, 2),
+      `全部记录_${App.me.empNo}_${stamp()}.json`, () => toast('已导出全部记录', 'ok'));
+  });
+
+  $('#btnClearAll').addEventListener('click', () => {
+    if (!confirm('清空本机全部记录？导出的文件不受影响，但本机将不再保留副本。')) return;
+    App.records = [];
+    App.saveRecords();
+    renderMe();
+    toast('已清空');
+  });
+}
+
+/* ===================== 启动 ===================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+  App.load();
+
+  $$('.tab').forEach((t) => {
+    t.addEventListener('click', () => showTab(t.dataset.tab));
+  });
+
+  $('#fallbackClose').addEventListener('click', () => {
+    $('#fallback').classList.remove('show');
+  });
+
+  // 首次使用强制填身份
+  if (!App.me || !App.me.empNo) {
+    showTab('me');
+    toast('请先填写工号和姓名');
+    return;
+  }
+
+  showTab('new');
+});
+
+})();
+</script>
+</body>
+</html>
