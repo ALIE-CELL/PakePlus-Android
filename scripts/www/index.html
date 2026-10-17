@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#1f6feb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>实验记录</title>
+  <link rel="stylesheet" href="phone.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <div class="top-title">实验记录</div>
+    <div class="top-sub" id="topSub">离线记录 · 导入内网后扣库存</div>
+  </header>
+
+  <!-- ===== 内容区 ===== -->
+  <main class="content">
+
+    <section class="pane on" id="pane-new"></section>
+    <section class="pane" id="pane-list"></section>
+    <section class="pane" id="pane-me"></section>
+
+  </main>
+
+  <!-- ===== 底部导航 ===== -->
+  <nav class="tabs">
+    <div class="tab on" data-tab="new">
+      <div class="ico">＋</div>
+      <div class="lbl">记录</div>
+    </div>
+    <div class="tab" data-tab="list">
+      <div class="ico">☰</div>
+      <div class="lbl">待传</div>
+    </div>
+    <div class="tab" data-tab="me">
+      <div class="ico">☺</div>
+      <div class="lbl">我的</div>
+    </div>
+  </nav>
+
+</div>
+
+<!-- ===== 复制兜底层 ===== -->
+<div class="fallback" id="fallback">
+  <div class="fb-box">
+    <div class="fb-title">请复制下面内容</div>
+    <div class="fb-name" id="fallbackName"></div>
+    <textarea id="fallbackText" readonly></textarea>
+    <button class="btn" id="fallbackClose">关闭</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="../presets.js"></script>
+<script src="phone.js"></script>
+</body>
+</html>
